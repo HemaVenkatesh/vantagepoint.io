@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  --background: 253 251 249;
+  --foreground: 44 36 23;
+  --card: 255 255 255;
+  --card-foreground: 44 36 23;
+  --primary: 139 111 71;
+  --primary-foreground: 255 255 255;
+  --secondary: 226 209 195;
+  --secondary-foreground: 44 36 23;
+  --muted: 189 154 122;
+  --muted-foreground: 92 74 58;
+  --accent: 166 124 82;
+  --accent-foreground: 255 255 255;
+  --border: 139 111 71;
+  --radius: 0.75rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: var(--font-serif), serif;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out both;
+}
