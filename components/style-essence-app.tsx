@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Camera,
   Mail,
@@ -13,6 +13,9 @@ import {
   Heart,
   Shirt,
   Search,
+  SkipForward,
+  ExternalLink,
+  Loader2,
 } from "lucide-react";
 
 interface QuestionOption {
@@ -134,7 +137,29 @@ export function StyleEssenceApp() {
   const [emailMethod, setEmailMethod] = useState<EmailMethod>(null);
   const [answers, setAnswers] = useState<Record<string, QuestionOption>>({});
   const [emailText, setEmailText] = useState("");
+  const [gmailToken, setGmailToken] = useState<string | null>(null);
+  const [gmailError, setGmailError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Check for Gmail OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("gmail_token");
+    const error = params.get("error");
+
+    if (token) {
+      setGmailToken(token);
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+      // Auto-trigger analysis if we have a token
+      analyzeGmailEmails(token);
+    }
+
+    if (error) {
+      setGmailError(error === "access_denied" ? "Gmail access was denied" : `Error: ${error}`);
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   const handleAnswer = (questionId: string, option: QuestionOption) => {
     setAnswers((prev) => ({ ...prev, [questionId]: option }));
@@ -154,24 +179,67 @@ export function StyleEssenceApp() {
       .map(([trait]) => trait);
   };
 
-  const simulateEmailAnalysis = () => {
+  // Initiate Gmail OAuth flow
+  const startGmailAuth = async () => {
     setLoading(true);
-    // Simulate API call with demo data
-    setTimeout(() => {
+    setGmailError(null);
+    try {
+      const response = await fetch("/api/gmail/auth");
+      const data = await response.json();
+      
+      if (data.error) {
+        setGmailError(data.error);
+        setLoading(false);
+        return;
+      }
+      
+      // Redirect to Google OAuth
+      window.location.href = data.authUrl;
+    } catch (err) {
+      console.error("Gmail auth error:", err);
+      setGmailError("Failed to start Gmail authentication");
+      setLoading(false);
+    }
+  };
+
+  // Analyze Gmail emails with access token
+  const analyzeGmailEmails = async (token: string) => {
+    setLoading(true);
+    setGmailError(null);
+    setStep("email");
+    setEmailMethod("gmail");
+
+    try {
+      const response = await fetch("/api/gmail/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: token }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setGmailError(data.error);
+        setLoading(false);
+        return;
+      }
+
       setProfile((prev) => ({
         ...prev,
         emailOrders: {
-          brands: ["Zara", "H&M", "Uniqlo", "Nike"],
-          colors: ["Navy", "Black", "White", "Beige"],
-          styles: ["Casual", "Minimalist", "Athleisure"],
-          priceRange: "Mid-range",
-          frequency: "Monthly",
-          gaps: ["Formal wear", "Statement pieces", "Accessories"],
+          brands: data.analysis.brands,
+          styles: data.analysis.styles,
+          priceRange: data.analysis.priceRange,
+          gaps: data.analysis.gaps,
         },
       }));
       setStep("photo");
       setLoading(false);
-    }, 2000);
+    } catch (err) {
+      console.error("Gmail analysis error:", err);
+      setGmailError("Failed to analyze emails. Please try again.");
+      setLoading(false);
+    }
   };
 
   const analyzeEmailsPaste = () => {
@@ -192,6 +260,25 @@ export function StyleEssenceApp() {
       setStep("photo");
       setLoading(false);
     }, 2000);
+  };
+
+  // Skip photo and use default color analysis
+  const skipPhotoStep = () => {
+    setLoading(true);
+    
+    // Use a neutral/universal color analysis when skipped
+    const defaultColorAnalysis: ColorAnalysis = {
+      undertone: "Neutral",
+      season: "Soft Summer",
+      bestColors: ["Slate Blue", "Dusty Rose", "Sage Green", "Soft White", "Lavender"],
+      avoidColors: ["Harsh Black", "Neon colors", "Very warm oranges"],
+      analysis:
+        "Based on general styling principles, we recommend soft, muted colors that work universally well. For a more precise analysis, consider uploading a photo in natural lighting.",
+    };
+
+    setProfile((prev) => ({ ...prev, colorAnalysis: defaultColorAnalysis }));
+    setStep("results");
+    generateRecommendations(defaultColorAnalysis);
   };
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -515,6 +602,12 @@ export function StyleEssenceApp() {
               </ul>
             </div>
 
+            {gmailError && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-6 text-red-700 text-sm font-sans">
+                {gmailError}
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button
                 onClick={() => setEmailMethod(null)}
@@ -523,15 +616,25 @@ export function StyleEssenceApp() {
                 Back
               </button>
               <button
-                onClick={simulateEmailAnalysis}
+                onClick={startGmailAuth}
                 disabled={loading}
-                className="flex-[2] p-5 text-white border-none rounded-xl text-base font-sans font-medium transition-all duration-300 tracking-wider uppercase"
+                className="flex-[2] p-5 text-white border-none rounded-xl text-base font-sans font-medium transition-all duration-300 tracking-wider uppercase flex items-center justify-center gap-2"
                 style={{
                   background: loading ? "#ccc" : "#8b6f47",
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
-                {loading ? "Analyzing Gmail..." : "Start Gmail Analysis"}
+                {loading ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    Connecting to Gmail...
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink size={20} />
+                    Connect Gmail Account
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -617,9 +720,26 @@ export function StyleEssenceApp() {
               className="hidden"
             />
 
-            {loading && (
-              <div className="text-center p-5 text-base text-[#8b6f47] font-sans">
+            {loading ? (
+              <div className="text-center p-5 text-base text-[#8b6f47] font-sans flex items-center justify-center gap-2">
+                <Loader2 size={20} className="animate-spin" />
                 Analyzing your colors...
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setStep("email")}
+                  className="flex-1 p-5 bg-[#8b6f47]/10 text-[#8b6f47] border-2 border-[#8b6f47] rounded-xl text-base font-sans font-medium cursor-pointer transition-all duration-300 tracking-wider uppercase"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={skipPhotoStep}
+                  className="flex-1 p-5 bg-white/50 text-[#5c4a3a] border-2 border-[#5c4a3a]/30 rounded-xl text-base font-sans font-medium cursor-pointer transition-all duration-300 tracking-wider uppercase flex items-center justify-center gap-2 hover:bg-white/70"
+                >
+                  <SkipForward size={18} />
+                  Skip for Now
+                </button>
               </div>
             )}
           </div>
