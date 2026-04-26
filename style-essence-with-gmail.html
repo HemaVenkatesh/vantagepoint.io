@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style Essence - Personal Fashion Intelligence</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        // Simple Icon Components
+        const Camera = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+            </svg>
+        );
+
+        const Mail = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+            </svg>
+        );
+
+        const Palette = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="8" r="1.5" fill={color}/>
+                <circle cx="8.5" cy="10.5" r="1.5" fill={color}/>
+                <circle cx="15.5" cy="10.5" r="1.5" fill={color}/>
+                <circle cx="8.5" cy="15.5" r="1.5" fill={color}/>
+            </svg>
+        );
+
+        const User = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+        );
+
+        const CheckCircle = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        );
+
+        const ChevronRight = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        );
+
+        const Upload = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+        );
+
+        const Sparkles = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                <path d="M5 3v4"/>
+                <path d="M19 17v4"/>
+                <path d="M3 5h4"/>
+                <path d="M17 19h4"/>
+            </svg>
+        );
+
+        const Heart = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+        );
+
+        const Shirt = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+            </svg>
+        );
+
+        const Search = ({ size = 24, color = "#000" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
+        );
+
+        function PersonalizedFashionApp() {
+          const [step, setStep] = useState('welcome');
+          const [profile, setProfile] = useState({
+            personality: [],
+            emailOrders: [],
+            facePhoto: null,
+            colorAnalysis: null,
+            recommendations: null
+          });
+          const [loading, setLoading] = useState(false);
+          const [emailMethod, setEmailMethod] = useState(null); // 'gmail' or 'paste'
+          const fileInputRef = useRef(null);
+
+          // Psychological questionnaire data
+          const questionnaire = [
+            {
+              id: 'social',
+              question: 'How do you feel in social gatherings?',
+              options: [
+                { value: 'energized', label: 'Energized and excited', traits: ['extroverted', 'bold'] },
+                { value: 'comfortable', label: 'Comfortable and engaged', traits: ['balanced', 'approachable'] },
+                { value: 'reserved', label: 'Reserved but present', traits: ['introverted', 'subtle'] },
+                { value: 'overwhelmed', label: 'Prefer smaller groups', traits: ['introverted', 'minimalist'] }
+              ]
+            },
+            {
+              id: 'expression',
+              question: 'How do you like to express yourself?',
+              options: [
+                { value: 'bold', label: 'Bold and eye-catching', traits: ['creative', 'confident', 'maximalist'] },
+                { value: 'unique', label: 'Unique but tasteful', traits: ['artistic', 'individual'] },
+                { value: 'classic', label: 'Classic and timeless', traits: ['traditional', 'elegant'] },
+                { value: 'understated', label: 'Understated and refined', traits: ['minimalist', 'sophisticated'] }
+              ]
+            },
+            {
+              id: 'comfort',
+              question: 'What matters most in your clothing?',
+              options: [
+                { value: 'statement', label: 'Making a statement', traits: ['expressive', 'trendy'] },
+                { value: 'quality', label: 'Quality and craftsmanship', traits: ['discerning', 'investment'] },
+                { value: 'comfort', label: 'Comfort above all', traits: ['practical', 'relaxed'] },
+                { value: 'versatility', label: 'Versatility and mix-match', traits: ['strategic', 'efficient'] }
+              ]
+            },
+            {
+              id: 'shopping',
+              question: 'How do you approach shopping?',
+              options: [
+                { value: 'impulse', label: 'I buy what catches my eye', traits: ['spontaneous', 'trend-driven'] },
+                { value: 'curated', label: 'I carefully curate each piece', traits: ['intentional', 'collector'] },
+                { value: 'planned', label: 'I plan purchases strategically', traits: ['organized', 'methodical'] },
+                { value: 'minimal', label: 'I buy only what I need', traits: ['minimalist', 'conscious'] }
+              ]
+            },
+            {
+              id: 'confidence',
+              question: 'When do you feel most confident?',
+              options: [
+                { value: 'standout', label: 'When I stand out', traits: ['bold', 'unique'] },
+                { value: 'polished', label: 'When I look polished', traits: ['refined', 'professional'] },
+                { value: 'authentic', label: 'When I feel authentic', traits: ['genuine', 'comfortable'] },
+                { value: 'prepared', label: 'When I\'m well-prepared', traits: ['meticulous', 'detail-oriented'] }
+              ]
+            }
+          ];
+
+          const [answers, setAnswers] = useState({});
+          const [emailText, setEmailText] = useState('');
+
+          const handleAnswer = (questionId, option) => {
+            setAnswers(prev => ({ ...prev, [questionId]: option }));
+          };
+
+          const analyzePersonality = () => {
+            const traits = {};
+            Object.values(answers).forEach(answer => {
+              answer.traits.forEach(trait => {
+                traits[trait] = (traits[trait] || 0) + 1;
+              });
+            });
+
+            const sortedTraits = Object.entries(traits)
+              .sort(([, a], [, b]) => b - a)
+              .slice(0, 5)
+              .map(([trait]) => trait);
+
+            return sortedTraits;
+          };
+
+          // Gmail API integration - Search and analyze fashion order emails
+          const analyzeGmailOrders = async () => {
+            setLoading(true);
+            try {
+              // Search for fashion order emails using Gmail MCP
+              const searchResponse = await fetch("https://api.anthropic.com/v1/messages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  model: "claude-sonnet-4-20250514",
+                  max_tokens: 2000,
+                  mcp_servers: [{
+                    type: "url",
+                    url: "https://gmail-mcp.googleapis.com/mcp/v1",
+                    name: "gmail-mcp"
+                  }],
+                  messages: [{
+                    role: "user",
+                    content: `Search my Gmail for fashion and clothing order confirmation emails from the past 2 years. Look for emails from brands like Zara, H&M, ASOS, Uniqlo, Amazon Fashion, Nordstrom, Macy's, Gap, Nike, Adidas, etc.
+
+After finding the emails, analyze them and extract:
+1. Brand preferences (list all brands found)
+2. Color preferences (colors mentioned in orders)
+3. Style categories (casual, formal, sporty, activewear, etc.)
+4. Price range (budget, mid-range, premium)
+5. Shopping frequency (how often they shop)
+6. Wardrobe gaps (what's missing based on orders)
+
+Return ONLY valid JSON:
+{
+  "brands": ["brand1", "brand2"],
+  "colors": ["color1", "color2"],
+  "styles": ["style1", "style2"],
+  "priceRange": "range",
+  "frequency": "frequency",
+  "gaps": ["gap1", "gap2"],
+  "emailsAnalyzed": number
+}`
+                  }]
+                })
+              });
+
+              const data = await searchResponse.json();
+              
+              // Extract tool results from MCP response
+              const toolResults = data.content
+                .filter(item => item.type === "mcp_tool_result")
+                .map(item => item.content?.[0]?.text || "")
+                .join("\n");
+
+              // Extract text responses
+              const textResponses = data.content
+                .filter(item => item.type === "text")
+                .map(item => item.text)
+                .join("\n");
+
+              const fullResponse = toolResults + "\n" + textResponses;
+              const cleanText = fullResponse.replace(/```json|```/g, "").trim();
+              
+              // Try to parse JSON from the response
+              const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                setProfile(prev => ({ ...prev, emailOrders: parsed }));
+                setStep('photo');
+              } else {
+                throw new Error("Could not parse email analysis results");
+              }
+            } catch (error) {
+              console.error('Gmail analysis error:', error);
+              alert('Error analyzing Gmail. Please try manual paste method or check Gmail connection.');
+              setEmailMethod(null);
+            }
+            setLoading(false);
+          };
+
+          const analyzeEmailsPaste = async () => {
+            setLoading(true);
+            try {
+              const response = await fetch("https://api.anthropic.com/v1/messages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  model: "claude-sonnet-4-20250514",
+                  max_tokens: 1000,
+                  messages: [{
+                    role: "user",
+                    content: `Analyze this email history for fashion purchases and extract:
+1. Brand preferences
+2. Color preferences
+3. Style categories (casual, formal, sporty, etc.)
+4. Price range
+5. Shopping frequency
+6. Wardrobe gaps
+
+Email content:
+${emailText}
+
+Return ONLY valid JSON with this structure:
+{
+  "brands": ["brand1", "brand2"],
+  "colors": ["color1", "color2"],
+  "styles": ["style1", "style2"],
+  "priceRange": "range",
+  "frequency": "frequency",
+  "gaps": ["gap1", "gap2"]
+}`
+                  }]
+                })
+              });
+
+              const data = await response.json();
+              const text = data.content.map(item => item.text || "").join("\n").trim();
+              const cleanText = text.replace(/```json|```/g, "").trim();
+              const parsed = JSON.parse(cleanText);
+              
+              setProfile(prev => ({ ...prev, emailOrders: parsed }));
+              setStep('photo');
+            } catch (error) {
+              console.error('Email analysis error:', error);
+              alert('Error analyzing emails. Please try again.');
+            }
+            setLoading(false);
+          };
+
+          const handlePhotoUpload = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            setLoading(true);
+            try {
+              const base64Data = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(",")[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+              });
+
+              setProfile(prev => ({ ...prev, facePhoto: base64Data }));
+
+              const response = await fetch("https://api.anthropic.com/v1/messages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  model: "claude-sonnet-4-20250514",
+                  max_tokens: 1000,
+                  messages: [{
+                    role: "user",
+                    content: [
+                      {
+                        type: "image",
+                        source: { type: "base64", media_type: file.type, data: base64Data }
+                      },
+                      {
+                        type: "text",
+                        text: `Analyze this person's face for color season and provide fashion color recommendations. Consider:
+1. Skin undertone (warm, cool, neutral)
+2. Hair color
+3. Eye color
+4. Overall color season (Spring, Summer, Autumn, Winter)
+5. Best colors for this person
+6. Colors to avoid
+
+Return ONLY valid JSON:
+{
+  "undertone": "warm/cool/neutral",
+  "season": "Spring/Summer/Autumn/Winter",
+  "bestColors": ["color1", "color2", "color3"],
+  "avoidColors": ["color1", "color2"],
+  "analysis": "brief explanation"
+}`
+                      }
+                    ]
+                  }]
+                })
+              });
+
+              const data = await response.json();
+              const text = data.content.map(item => item.text || "").join("\n").trim();
+              const cleanText = text.replace(/```json|```/g, "").trim();
+              const colorAnalysis = JSON.parse(cleanText);
+
+              setProfile(prev => ({ ...prev, colorAnalysis }));
+              setStep('results');
+              generateRecommendations(colorAnalysis);
+            } catch (error) {
+              console.error('Photo analysis error:', error);
+              alert('Error analyzing photo. Please try again.');
+            }
+            setLoading(false);
+          };
+
+          const generateRecommendations = async (colorAnalysis) => {
+            setLoading(true);
+            try {
+              const personality = analyzePersonality();
+              
+              const response = await fetch("https://api.anthropic.com/v1/messages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  model: "claude-sonnet-4-20250514",
+                  max_tokens: 1500,
+                  messages: [{
+                    role: "user",
+                    content: `Create personalized fashion recommendations based on:
+
+Personality Traits: ${personality.join(', ')}
+Current Wardrobe: ${JSON.stringify(profile.emailOrders)}
+Color Analysis: ${JSON.stringify(colorAnalysis)}
+
+Provide:
+1. 5 specific items to add that complement existing wardrobe
+2. Color combinations to try
+3. Style tips based on personality
+4. Brands to explore
+
+Return ONLY valid JSON:
+{
+  "items": [{"name": "item", "reason": "why", "colors": ["color1"]}],
+  "colorCombos": [{"combo": "color1 + color2", "occasion": "when"}],
+  "styleTips": ["tip1", "tip2"],
+  "brands": ["brand1", "brand2"]
+}`
+                  }]
+                })
+              });
+
+              const data = await response.json();
+              const text = data.content.map(item => item.text || "").join("\n").trim();
+              const cleanText = text.replace(/```json|```/g, "").trim();
+              const recommendations = JSON.parse(cleanText);
+
+              setProfile(prev => ({ ...prev, recommendations }));
+            } catch (error) {
+              console.error('Recommendations error:', error);
+            }
+            setLoading(false);
+          };
+
+          return (
+            <div style={{
+              minHeight: '100vh',
+              background: 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
+              fontFamily: '"Cormorant Garamond", serif',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Decorative background elements */}
+              <div style={{
+                position: 'absolute',
+                top: '-10%',
+                right: '-5%',
+                width: '500px',
+                height: '500px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(212,175,155,0.2) 0%, transparent 70%)',
+                filter: 'blur(60px)',
+                pointerEvents: 'none'
+              }} />
+              <div style={{
+                position: 'absolute',
+                bottom: '-10%',
+                left: '-5%',
+                width: '400px',
+                height: '400px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(189,154,122,0.15) 0%, transparent 70%)',
+                filter: 'blur(60px)',
+                pointerEvents: 'none'
+              }} />
+
+              <div style={{
+                maxWidth: '900px',
+                margin: '0 auto',
+                padding: '60px 24px',
+                position: 'relative',
+                zIndex: 1
+              }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginBottom: '16px'
+                  }}>
+                    <Sparkles size={28} color="#8b6f47" />
+                    <h1 style={{
+                      fontSize: '56px',
+                      fontWeight: '400',
+                      margin: 0,
+                      color: '#2c2417',
+                      letterSpacing: '0.02em'
+                    }}>
+                      Style Essence
+                    </h1>
+                  </div>
+                  <p style={{
+                    fontSize: '18px',
+                    color: '#5c4a3a',
+                    fontFamily: '"Inter", sans-serif',
+                    fontWeight: '300',
+                    letterSpacing: '0.03em',
+                    textTransform: 'uppercase'
+                  }}>
+                    Your Personal Fashion Intelligence
+                  </p>
+                </div>
+
+                {/* Progress indicator */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '12px',
+                  marginBottom: '48px'
+                }}>
+                  {['welcome', 'questionnaire', 'email', 'photo', 'results'].map((s, i) => (
+                    <div key={s} style={{
+                      width: '40px',
+                      height: '4px',
+                      background: ['welcome', 'questionnaire', 'email', 'photo', 'results'].indexOf(step) >= i
+                        ? '#8b6f47'
+                        : 'rgba(139, 111, 71, 0.2)',
+                      borderRadius: '2px',
+                      transition: 'all 0.4s ease'
+                    }} />
+                  ))}
+                </div>
+
+                {/* Welcome Screen */}
+                {step === 'welcome' && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '24px',
+                    padding: '60px 48px',
+                    border: '1px solid rgba(139, 111, 71, 0.1)',
+                    boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                    animation: 'fadeIn 0.6s ease-out'
+                  }}>
+                    <h2 style={{
+                      fontSize: '36px',
+                      fontWeight: '300',
+                      color: '#2c2417',
+                      marginBottom: '24px',
+                      textAlign: 'center'
+                    }}>
+                      Discover Your Perfect Style
+                    </h2>
+                    <p style={{
+                      fontSize: '18px',
+                      color: '#5c4a3a',
+                      lineHeight: '1.8',
+                      marginBottom: '40px',
+                      textAlign: 'center',
+                      fontFamily: '"Inter", sans-serif'
+                    }}>
+                      We'll analyze your personality, shopping history, and natural colors to create
+                      a personalized style profile that enhances your wardrobe.
+                    </p>
+
+                    <div style={{ display: 'grid', gap: '20px', marginBottom: '40px' }}>
+                      {[
+                        { Icon: User, text: 'Psychological style profiling', color: '#8b6f47' },
+                        { Icon: Mail, text: 'Automatic Gmail order analysis', color: '#a67c52' },
+                        { Icon: Camera, text: 'Personal color season analysis', color: '#bd9a7a' },
+                        { Icon: Palette, text: 'Curated wardrobe recommendations', color: '#c9a88a' }
+                      ].map((item, i) => (
+                        <div key={i} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '16px',
+                          padding: '20px',
+                          background: 'rgba(255, 255, 255, 0.5)',
+                          borderRadius: '12px',
+                          border: '1px solid rgba(139, 111, 71, 0.1)',
+                          transition: 'all 0.3s ease'
+                        }}>
+                          <item.Icon size={24} color={item.color} />
+                          <span style={{
+                            fontSize: '16px',
+                            color: '#2c2417',
+                            fontFamily: '"Inter", sans-serif'
+                          }}>
+                            {item.text}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => setStep('questionnaire')}
+                      style={{
+                        width: '100%',
+                        padding: '18px',
+                        background: '#8b6f47',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'all 0.3s ease',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase'
+                      }}
+                      onMouseOver={(e) => e.target.style.background = '#6d5838'}
+                      onMouseOut={(e) => e.target.style.background = '#8b6f47'}
+                    >
+                      Begin Your Journey
+                      <ChevronRight size={20} color="white" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Questionnaire - Same as before */}
+                {step === 'questionnaire' && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '24px',
+                    padding: '60px 48px',
+                    border: '1px solid rgba(139, 111, 71, 0.1)',
+                    boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                    animation: 'fadeIn 0.6s ease-out'
+                  }}>
+                    <h2 style={{
+                      fontSize: '32px',
+                      fontWeight: '300',
+                      color: '#2c2417',
+                      marginBottom: '12px'
+                    }}>
+                      Understanding Your Style Psychology
+                    </h2>
+                    <p style={{
+                      fontSize: '16px',
+                      color: '#5c4a3a',
+                      marginBottom: '40px',
+                      fontFamily: '"Inter", sans-serif'
+                    }}>
+                      Answer these questions to help us understand your unique style personality
+                    </p>
+
+                    {questionnaire.map((q, qIndex) => (
+                      <div key={q.id} style={{
+                        marginBottom: '36px',
+                        animation: `slideIn 0.5s ease-out ${qIndex * 0.1}s both`
+                      }}>
+                        <h3 style={{
+                          fontSize: '20px',
+                          fontWeight: '400',
+                          color: '#2c2417',
+                          marginBottom: '16px'
+                        }}>
+                          {qIndex + 1}. {q.question}
+                        </h3>
+                        <div style={{ display: 'grid', gap: '12px' }}>
+                          {q.options.map((option) => (
+                            <button
+                              key={option.value}
+                              onClick={() => handleAnswer(q.id, option)}
+                              style={{
+                                padding: '16px 20px',
+                                background: answers[q.id]?.value === option.value
+                                  ? 'rgba(139, 111, 71, 0.15)'
+                                  : 'rgba(255, 255, 255, 0.5)',
+                                border: answers[q.id]?.value === option.value
+                                  ? '2px solid #8b6f47'
+                                  : '1px solid rgba(139, 111, 71, 0.2)',
+                                borderRadius: '12px',
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                fontSize: '15px',
+                                fontFamily: '"Inter", sans-serif',
+                                color: '#2c2417',
+                                transition: 'all 0.3s ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px'
+                              }}
+                              onMouseOver={(e) => {
+                                if (answers[q.id]?.value !== option.value) {
+                                  e.target.style.background = 'rgba(139, 111, 71, 0.08)';
+                                }
+                              }}
+                              onMouseOut={(e) => {
+                                if (answers[q.id]?.value !== option.value) {
+                                  e.target.style.background = 'rgba(255, 255, 255, 0.5)';
+                                }
+                              }}
+                            >
+                              {answers[q.id]?.value === option.value && (
+                                <CheckCircle size={18} color="#8b6f47" />
+                              )}
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={() => {
+                        if (Object.keys(answers).length === questionnaire.length) {
+                          setProfile(prev => ({ ...prev, personality: analyzePersonality() }));
+                          setStep('email');
+                        } else {
+                          alert('Please answer all questions to continue');
+                        }
+                      }}
+                      disabled={Object.keys(answers).length !== questionnaire.length}
+                      style={{
+                        width: '100%',
+                        padding: '18px',
+                        background: Object.keys(answers).length === questionnaire.length ? '#8b6f47' : '#ccc',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: '500',
+                        cursor: Object.keys(answers).length === questionnaire.length ? 'pointer' : 'not-allowed',
+                        transition: 'all 0.3s ease',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        marginTop: '24px'
+                      }}
+                    >
+                      Continue to Email Analysis
+                    </button>
+                  </div>
+                )}
+
+                {/* Email Analysis Choice */}
+                {step === 'email' && !emailMethod && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '24px',
+                    padding: '60px 48px',
+                    border: '1px solid rgba(139, 111, 71, 0.1)',
+                    boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                    animation: 'fadeIn 0.6s ease-out'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <Mail size={28} color="#8b6f47" />
+                      <h2 style={{
+                        fontSize: '32px',
+                        fontWeight: '300',
+                        color: '#2c2417',
+                        margin: 0
+                      }}>
+                        Wardrobe Analysis
+                      </h2>
+                    </div>
+                    <p style={{
+                      fontSize: '16px',
+                      color: '#5c4a3a',
+                      marginBottom: '32px',
+                      fontFamily: '"Inter", sans-serif'
+                    }}>
+                      Choose how you'd like to analyze your fashion purchase history
+                    </p>
+
+                    <div style={{ display: 'grid', gap: '16px', marginBottom: '24px' }}>
+                      <button
+                        onClick={() => setEmailMethod('gmail')}
+                        style={{
+                          padding: '24px',
+                          background: 'rgba(255, 255, 255, 0.5)',
+                          border: '2px solid rgba(139, 111, 71, 0.2)',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = 'rgba(139, 111, 71, 0.08)';
+                          e.currentTarget.style.borderColor = '#8b6f47';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.5)';
+                          e.currentTarget.style.borderColor = 'rgba(139, 111, 71, 0.2)';
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+                          <Search size={24} color="#8b6f47" />
+                          <h3 style={{
+                            fontSize: '20px',
+                            fontWeight: '400',
+                            color: '#2c2417',
+                            margin: 0,
+                            fontFamily: '"Inter", sans-serif'
+                          }}>
+                            Auto-Scan Gmail (Recommended)
+                          </h3>
+                        </div>
+                        <p style={{
+                          fontSize: '14px',
+                          color: '#5c4a3a',
+                          fontFamily: '"Inter", sans-serif',
+                          margin: 0,
+                          paddingLeft: '40px'
+                        }}>
+                          Automatically search your Gmail for fashion order confirmations and analyze your shopping history
+                        </p>
+                      </button>
+
+                      <button
+                        onClick={() => setEmailMethod('paste')}
+                        style={{
+                          padding: '24px',
+                          background: 'rgba(255, 255, 255, 0.5)',
+                          border: '2px solid rgba(139, 111, 71, 0.2)',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = 'rgba(139, 111, 71, 0.08)';
+                          e.currentTarget.style.borderColor = '#8b6f47';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.5)';
+                          e.currentTarget.style.borderColor = 'rgba(139, 111, 71, 0.2)';
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+                          <Mail size={24} color="#8b6f47" />
+                          <h3 style={{
+                            fontSize: '20px',
+                            fontWeight: '400',
+                            color: '#2c2417',
+                            margin: 0,
+                            fontFamily: '"Inter", sans-serif'
+                          }}>
+                            Manual Paste
+                          </h3>
+                        </div>
+                        <p style={{
+                          fontSize: '14px',
+                          color: '#5c4a3a',
+                          fontFamily: '"Inter", sans-serif',
+                          margin: 0,
+                          paddingLeft: '40px'
+                        }}>
+                          Manually copy and paste your order confirmation emails
+                        </p>
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => setStep('questionnaire')}
+                      style={{
+                        width: '100%',
+                        padding: '18px',
+                        background: 'rgba(139, 111, 71, 0.1)',
+                        color: '#8b6f47',
+                        border: '2px solid #8b6f47',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      Back
+                    </button>
+                  </div>
+                )}
+
+                {/* Gmail Auto-Analysis */}
+                {step === 'email' && emailMethod === 'gmail' && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '24px',
+                    padding: '60px 48px',
+                    border: '1px solid rgba(139, 111, 71, 0.1)',
+                    boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                    animation: 'fadeIn 0.6s ease-out'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <Search size={28} color="#8b6f47" />
+                      <h2 style={{
+                        fontSize: '32px',
+                        fontWeight: '300',
+                        color: '#2c2417',
+                        margin: 0
+                      }}>
+                        Gmail Auto-Analysis
+                      </h2>
+                    </div>
+                    <p style={{
+                      fontSize: '16px',
+                      color: '#5c4a3a',
+                      marginBottom: '32px',
+                      fontFamily: '"Inter", sans-serif'
+                    }}>
+                      We'll search your Gmail for fashion order confirmations and analyze your shopping patterns automatically.
+                    </p>
+
+                    <div style={{
+                      padding: '24px',
+                      background: 'rgba(139, 111, 71, 0.05)',
+                      borderRadius: '12px',
+                      marginBottom: '24px',
+                      border: '1px solid rgba(139, 111, 71, 0.15)'
+                    }}>
+                      <h4 style={{
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: '#2c2417',
+                        marginBottom: '12px',
+                        fontFamily: '"Inter", sans-serif'
+                      }}>
+                        What we'll analyze:
+                      </h4>
+                      <ul style={{
+                        margin: 0,
+                        paddingLeft: '20px',
+                        fontSize: '14px',
+                        color: '#5c4a3a',
+                        fontFamily: '"Inter", sans-serif',
+                        lineHeight: '1.8'
+                      }}>
+                        <li>Order confirmations from fashion retailers</li>
+                        <li>Brands you purchase from most often</li>
+                        <li>Color and style preferences</li>
+                        <li>Price range patterns</li>
+                        <li>Shopping frequency</li>
+                      </ul>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        onClick={() => setEmailMethod(null)}
+                        style={{
+                          flex: 1,
+                          padding: '18px',
+                          background: 'rgba(139, 111, 71, 0.1)',
+                          color: '#8b6f47',
+                          border: '2px solid #8b6f47',
+                          borderRadius: '12px',
+                          fontSize: '16px',
+                          fontFamily: '"Inter", sans-serif',
+                          fontWeight: '500',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase'
+                        }}
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={analyzeGmailOrders}
+                        disabled={loading}
+                        style={{
+                          flex: 2,
+                          padding: '18px',
+                          background: loading ? '#ccc' : '#8b6f47',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '12px',
+                          fontSize: '16px',
+                          fontFamily: '"Inter", sans-serif',
+                          fontWeight: '500',
+                          cursor: loading ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.3s ease',
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase'
+                        }}
+                      >
+                        {loading ? 'Analyzing Gmail...' : 'Start Gmail Analysis'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Manual Paste Email Analysis */}
+                {step === 'email' && emailMethod === 'paste' && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '24px',
+                    padding: '60px 48px',
+                    border: '1px solid rgba(139, 111, 71, 0.1)',
+                    boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                    animation: 'fadeIn 0.6s ease-out'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <Mail size={28} color="#8b6f47" />
+                      <h2 style={{
+                        fontSize: '32px',
+                        fontWeight: '300',
+                        color: '#2c2417',
+                        margin: 0
+                      }}>
+                        Manual Email Analysis
+                      </h2>
+                    </div>
+                    <p style={{
+                      fontSize: '16px',
+                      color: '#5c4a3a',
+                      marginBottom: '32px',
+                      fontFamily: '"Inter", sans-serif'
+                    }}>
+                      Paste your fashion order confirmation emails below. We'll analyze your shopping patterns,
+                      brand preferences, and identify gaps in your wardrobe.
+                    </p>
+
+                    <textarea
+                      value={emailText}
+                      onChange={(e) => setEmailText(e.target.value)}
+                      placeholder="Paste your order confirmation emails here... (e.g., from Zara, H&M, ASOS, etc.)"
+                      style={{
+                        width: '100%',
+                        minHeight: '300px',
+                        padding: '20px',
+                        border: '2px solid rgba(139, 111, 71, 0.2)',
+                        borderRadius: '12px',
+                        fontSize: '15px',
+                        fontFamily: '"Inter", sans-serif',
+                        resize: 'vertical',
+                        marginBottom: '24px',
+                        background: 'rgba(255, 255, 255, 0.7)',
+                        color: '#2c2417'
+                      }}
+                    />
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        onClick={() => setEmailMethod(null)}
+                        style={{
+                          flex: 1,
+                          padding: '18px',
+                          background: 'rgba(139, 111, 71, 0.1)',
+                          color: '#8b6f47',
+                          border: '2px solid #8b6f47',
+                          borderRadius: '12px',
+                          fontSize: '16px',
+                          fontFamily: '"Inter", sans-serif',
+                          fontWeight: '500',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase'
+                        }}
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={analyzeEmailsPaste}
+                        disabled={!emailText.trim() || loading}
+                        style={{
+                          flex: 2,
+                          padding: '18px',
+                          background: emailText.trim() && !loading ? '#8b6f47' : '#ccc',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '12px',
+                          fontSize: '16px',
+                          fontFamily: '"Inter", sans-serif',
+                          fontWeight: '500',
+                          cursor: emailText.trim() && !loading ? 'pointer' : 'not-allowed',
+                          transition: 'all 0.3s ease',
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase'
+                        }}
+                      >
+                        {loading ? 'Analyzing...' : 'Analyze My Wardrobe'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Photo Upload - Same as before, keeping rest of code... */}
+                {step === 'photo' && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '24px',
+                    padding: '60px 48px',
+                    border: '1px solid rgba(139, 111, 71, 0.1)',
+                    boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                    animation: 'fadeIn 0.6s ease-out'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <Camera size={28} color="#8b6f47" />
+                      <h2 style={{
+                        fontSize: '32px',
+                        fontWeight: '300',
+                        color: '#2c2417',
+                        margin: 0
+                      }}>
+                        Personal Color Analysis
+                      </h2>
+                    </div>
+                    <p style={{
+                      fontSize: '16px',
+                      color: '#5c4a3a',
+                      marginBottom: '32px',
+                      fontFamily: '"Inter", sans-serif'
+                    }}>
+                      Upload a clear photo of your face in natural lighting. We'll determine your color season
+                      and recommend the most flattering colors for your complexion.
+                    </p>
+
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{
+                        border: '3px dashed rgba(139, 111, 71, 0.3)',
+                        borderRadius: '16px',
+                        padding: '60px 40px',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        background: 'rgba(255, 255, 255, 0.4)',
+                        transition: 'all 0.3s ease',
+                        marginBottom: '24px'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.borderColor = '#8b6f47';
+                        e.currentTarget.style.background = 'rgba(139, 111, 71, 0.05)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(139, 111, 71, 0.3)';
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.4)';
+                      }}
+                    >
+                      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                        <Upload size={48} color="#8b6f47" />
+                      </div>
+                      <p style={{
+                        fontSize: '18px',
+                        color: '#2c2417',
+                        marginBottom: '8px',
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: '500'
+                      }}>
+                        Click to upload your photo
+                      </p>
+                      <p style={{
+                        fontSize: '14px',
+                        color: '#5c4a3a',
+                        fontFamily: '"Inter", sans-serif'
+                      }}>
+                        For best results: face the camera directly in natural daylight
+                      </p>
+                    </div>
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      style={{ display: 'none' }}
+                    />
+
+                    {loading && (
+                      <div style={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        fontSize: '16px',
+                        color: '#8b6f47',
+                        fontFamily: '"Inter", sans-serif'
+                      }}>
+                        Analyzing your colors...
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Results section - keeping the same as before */}
+                {step === 'results' && profile.colorAnalysis && (
+                  <div style={{ animation: 'fadeIn 0.6s ease-out' }}>
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.6)',
+                      backdropFilter: 'blur(20px)',
+                      borderRadius: '24px',
+                      padding: '48px',
+                      border: '1px solid rgba(139, 111, 71, 0.1)',
+                      boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                      marginBottom: '24px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                        <Heart size={24} color="#8b6f47" />
+                        <h3 style={{
+                          fontSize: '24px',
+                          fontWeight: '300',
+                          color: '#2c2417',
+                          margin: 0
+                        }}>
+                          Your Style Personality
+                        </h3>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '12px'
+                      }}>
+                        {profile.personality.map((trait, i) => (
+                          <span key={i} style={{
+                            padding: '10px 20px',
+                            background: 'rgba(139, 111, 71, 0.12)',
+                            borderRadius: '24px',
+                            fontSize: '14px',
+                            color: '#2c2417',
+                            fontFamily: '"Inter", sans-serif',
+                            textTransform: 'capitalize',
+                            letterSpacing: '0.05em'
+                          }}>
+                            {trait}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {profile.emailOrders && profile.emailOrders.brands && (
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.6)',
+                        backdropFilter: 'blur(20px)',
+                        borderRadius: '24px',
+                        padding: '48px',
+                        border: '1px solid rgba(139, 111, 71, 0.1)',
+                        boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                        marginBottom: '24px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                          <Shirt size={24} color="#8b6f47" />
+                          <h3 style={{
+                            fontSize: '24px',
+                            fontWeight: '300',
+                            color: '#2c2417',
+                            margin: 0
+                          }}>
+                            Your Shopping Insights
+                          </h3>
+                        </div>
+                        
+                        <div style={{ marginBottom: '20px' }}>
+                          <h4 style={{
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            color: '#2c2417',
+                            marginBottom: '12px',
+                            fontFamily: '"Inter", sans-serif',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em'
+                          }}>
+                            Favorite Brands
+                          </h4>
+                          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                            {profile.emailOrders.brands.map((brand, i) => (
+                              <span key={i} style={{
+                                padding: '10px 20px',
+                                background: 'rgba(139, 111, 71, 0.12)',
+                                borderRadius: '24px',
+                                fontSize: '14px',
+                                color: '#2c2417',
+                                fontFamily: '"Inter", sans-serif'
+                              }}>
+                                {brand}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: '20px' }}>
+                          <h4 style={{
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            color: '#2c2417',
+                            marginBottom: '12px',
+                            fontFamily: '"Inter", sans-serif',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em'
+                          }}>
+                            Style Categories
+                          </h4>
+                          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                            {profile.emailOrders.styles.map((style, i) => (
+                              <span key={i} style={{
+                                padding: '10px 20px',
+                                background: 'rgba(139, 111, 71, 0.12)',
+                                borderRadius: '24px',
+                                fontSize: '14px',
+                                color: '#2c2417',
+                                fontFamily: '"Inter", sans-serif',
+                                textTransform: 'capitalize'
+                              }}>
+                                {style}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {profile.emailOrders.gaps && (
+                          <div>
+                            <h4 style={{
+                              fontSize: '16px',
+                              fontWeight: '500',
+                              color: '#2c2417',
+                              marginBottom: '12px',
+                              fontFamily: '"Inter", sans-serif',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.08em'
+                            }}>
+                              Wardrobe Gaps
+                            </h4>
+                            <ul style={{
+                              margin: 0,
+                              paddingLeft: '20px',
+                              fontSize: '14px',
+                              color: '#5c4a3a',
+                              fontFamily: '"Inter", sans-serif',
+                              lineHeight: '1.8'
+                            }}>
+                              {profile.emailOrders.gaps.map((gap, i) => (
+                                <li key={i}>{gap}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.6)',
+                      backdropFilter: 'blur(20px)',
+                      borderRadius: '24px',
+                      padding: '48px',
+                      border: '1px solid rgba(139, 111, 71, 0.1)',
+                      boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)',
+                      marginBottom: '24px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                        <Palette size={24} color="#8b6f47" />
+                        <h3 style={{
+                          fontSize: '24px',
+                          fontWeight: '300',
+                          color: '#2c2417',
+                          margin: 0
+                        }}>
+                          Your Color Season: {profile.colorAnalysis.season}
+                        </h3>
+                      </div>
+                      <p style={{
+                        fontSize: '15px',
+                        color: '#5c4a3a',
+                        marginBottom: '24px',
+                        fontFamily: '"Inter", sans-serif',
+                        lineHeight: '1.7'
+                      }}>
+                        {profile.colorAnalysis.analysis}
+                      </p>
+                      
+                      <div style={{ marginBottom: '24px' }}>
+                        <h4 style={{
+                          fontSize: '16px',
+                          fontWeight: '500',
+                          color: '#2c2417',
+                          marginBottom: '12px',
+                          fontFamily: '"Inter", sans-serif',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.08em'
+                        }}>
+                          Your Best Colors
+                        </h4>
+                        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                          {profile.colorAnalysis.bestColors.map((color, i) => (
+                            <span key={i} style={{
+                              padding: '10px 20px',
+                              background: 'rgba(139, 111, 71, 0.12)',
+                              borderRadius: '24px',
+                              fontSize: '14px',
+                              color: '#2c2417',
+                              fontFamily: '"Inter", sans-serif',
+                              textTransform: 'capitalize'
+                            }}>
+                              {color}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 style={{
+                          fontSize: '16px',
+                          fontWeight: '500',
+                          color: '#2c2417',
+                          marginBottom: '12px',
+                          fontFamily: '"Inter", sans-serif',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.08em'
+                        }}>
+                          Colors to Minimize
+                        </h4>
+                        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                          {profile.colorAnalysis.avoidColors.map((color, i) => (
+                            <span key={i} style={{
+                              padding: '10px 20px',
+                              background: 'rgba(139, 111, 71, 0.06)',
+                              borderRadius: '24px',
+                              fontSize: '14px',
+                              color: '#5c4a3a',
+                              fontFamily: '"Inter", sans-serif',
+                              textTransform: 'capitalize',
+                              textDecoration: 'line-through'
+                            }}>
+                              {color}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {profile.recommendations && (
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.6)',
+                        backdropFilter: 'blur(20px)',
+                        borderRadius: '24px',
+                        padding: '48px',
+                        border: '1px solid rgba(139, 111, 71, 0.1)',
+                        boxShadow: '0 20px 60px rgba(44, 36, 23, 0.08)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                          <Sparkles size={24} color="#8b6f47" />
+                          <h3 style={{
+                            fontSize: '24px',
+                            fontWeight: '300',
+                            color: '#2c2417',
+                            margin: 0
+                          }}>
+                            Personalized Recommendations
+                          </h3>
+                        </div>
+
+                        {profile.recommendations.items && (
+                          <div style={{ marginBottom: '32px' }}>
+                            <h4 style={{
+                              fontSize: '18px',
+                              fontWeight: '400',
+                              color: '#2c2417',
+                              marginBottom: '16px'
+                            }}>
+                              Items to Complete Your Wardrobe
+                            </h4>
+                            <div style={{ display: 'grid', gap: '16px' }}>
+                              {profile.recommendations.items.map((item, i) => (
+                                <div key={i} style={{
+                                  padding: '20px',
+                                  background: 'rgba(255, 255, 255, 0.5)',
+                                  borderRadius: '12px',
+                                  border: '1px solid rgba(139, 111, 71, 0.1)'
+                                }}>
+                                  <h5 style={{
+                                    fontSize: '16px',
+                                    fontWeight: '500',
+                                    color: '#2c2417',
+                                    marginBottom: '8px',
+                                    fontFamily: '"Inter", sans-serif'
+                                  }}>
+                                    {item.name}
+                                  </h5>
+                                  <p style={{
+                                    fontSize: '14px',
+                                    color: '#5c4a3a',
+                                    marginBottom: '8px',
+                                    fontFamily: '"Inter", sans-serif'
+                                  }}>
+                                    {item.reason}
+                                  </p>
+                                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                    {item.colors.map((color, ci) => (
+                                      <span key={ci} style={{
+                                        padding: '6px 14px',
+                                        background: 'rgba(139, 111, 71, 0.1)',
+                                        borderRadius: '12px',
+                                        fontSize: '12px',
+                                        color: '#2c2417',
+                                        fontFamily: '"Inter", sans-serif'
+                                      }}>
+                                        {color}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {profile.recommendations.styleTips && (
+                          <div style={{ marginBottom: '32px' }}>
+                            <h4 style={{
+                              fontSize: '18px',
+                              fontWeight: '400',
+                              color: '#2c2417',
+                              marginBottom: '16px'
+                            }}>
+                              Style Tips for You
+                            </h4>
+                            <ul style={{
+                              listStyle: 'none',
+                              padding: 0,
+                              margin: 0,
+                              display: 'grid',
+                              gap: '12px'
+                            }}>
+                              {profile.recommendations.styleTips.map((tip, i) => (
+                                <li key={i} style={{
+                                  padding: '16px',
+                                  background: 'rgba(255, 255, 255, 0.5)',
+                                  borderRadius: '12px',
+                                  fontSize: '14px',
+                                  color: '#2c2417',
+                                  fontFamily: '"Inter", sans-serif',
+                                  lineHeight: '1.6',
+                                  paddingLeft: '44px',
+                                  position: 'relative'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    left: '16px',
+                                    top: '16px',
+                                    color: '#8b6f47'
+                                  }}>
+                                    ✦
+                                  </span>
+                                  {tip}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        setStep('welcome');
+                        setProfile({ personality: [], emailOrders: [], facePhoto: null, colorAnalysis: null, recommendations: null });
+                        setAnswers({});
+                        setEmailText('');
+                        setEmailMethod(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '18px',
+                        background: 'rgba(139, 111, 71, 0.1)',
+                        color: '#8b6f47',
+                        border: '2px solid #8b6f47',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        marginTop: '24px'
+                      }}
+                    >
+                      Start New Analysis
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Inter:wght@300;400;500&display=swap');
+                
+                @keyframes fadeIn {
+                  from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateY(0);
+                  }
+                }
+                
+                @keyframes slideIn {
+                  from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateX(0);
+                  }
+                }
+              `}</style>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PersonalizedFashionApp />);
+    </script>
+</body>
+</html>
